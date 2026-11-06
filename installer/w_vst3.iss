@@ -24,6 +24,14 @@ OutputDir=..\dist
 Compression=lzma2
 SolidCompression=yes
 
+[Languages]
+; Korean first so it is the default on Korean systems; English otherwise.
+Name: "korean"; MessagesFile: "Korean.isl"
+Name: "english"; MessagesFile: "compiler:Default.isl"
+
+[CustomMessages]
+english.CloseObs=Please close OBS Studio before installing. Continue?
+
 [Files]
 Source: "{#BuildDir}\w_vst3.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildDir}\w_vst3_scanner.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -33,9 +41,6 @@ Source: "{#BuildDir}\w_vst3_scanner.exe"; DestDir: "{app}"; Flags: ignoreversion
 function InitializeSetup(): Boolean;
 begin
   Result := True;
-  if MsgBox('Please close OBS Studio before installing. Continue?', mbConfirmation, MB_YESNO) = IDNO then
+  if MsgBox(CustomMessage('CloseObs'), mbConfirmation, MB_YESNO) = IDNO then
     Result := False;
 end;
-
-[UninstallDelete]
-Type: files; Name: "{userappdata}\obs-studio\plugin_config\w_vst3\scan-cache.json"
