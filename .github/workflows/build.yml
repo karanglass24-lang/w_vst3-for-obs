@@ -23,12 +23,6 @@ jobs:
         shell: pwsh
         run: ./scripts/setup-libobs.ps1
 
-      - name: Configure
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-
-      - name: Build
-        run: cmake --build build
-
       - name: Version
         id: ver
         shell: pwsh
@@ -36,11 +30,26 @@ jobs:
           if ($env:GITHUB_REF -like 'refs/tags/v*') { $v = $env:GITHUB_REF_NAME.TrimStart('v') } else { $v = "0.0.0-dev" }
           "version=$v" >> $env:GITHUB_OUTPUT
 
+      - name: Configure
+        # Quoted: PowerShell splits an unquoted -DNAME=0.1.0 at the first dot.
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release "-DW_VST3_VERSION=${{ steps.ver.outputs.version }}"
+
+      - name: Build
+        run: cmake --build build
+
       - name: Installer
         shell: pwsh
         run: |
           choco install innosetup -y --no-progress
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=${{ steps.ver.outputs.version }}" "/DBuildDir=..\build" installer\w_vst3.iss
+
+      - name: Checksum
+        shell: pwsh
+        run: |
+          # The in-app updater verifies the installer against this file.
+          $f = Get-ChildItem dist/*-setup.exe | Select-Object -First 1
+          $h = (Get-FileHash $f.FullName -Algorithm SHA256).Hash.ToLower()
+          [IO.File]::WriteAllText("$($f.FullName).sha256", "$h  $($f.Name)")
 
       - uses: actions/upload-artifact@v4
         with:
@@ -49,13 +58,16 @@ jobs:
             build/w_vst3.dll
             build/w_vst3_scanner.exe
             dist/*.exe
+            dist/*.sha256
 
       - name: Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           name: w_vst3 ${{ steps.ver.outputs.version }}
-          files: dist/*.exe
+          files: |
+            dist/*.exe
+            dist/*.sha256
           body: |
             OBS Studio plugin that hosts one VST3 effect as an audio filter.
 
@@ -68,4 +80,4 @@ jobs:
             - Plugins run inside the OBS process; a plugin crash can crash OBS.
             - The installer is unsigned, so Windows SmartScreen may warn.
 
-            See the [English](docs/USAGE.md) and [한국어](docs/USAGE.ko.md) user guides.
+            See the [English](https://github.com/karanglass24-lang/w_vst3-for-obs/blob/main/docs/USAGE.md) and [한국어](https://github.com/karanglass24-lang/w_vst3-for-obs/blob/main/docs/USAGE.ko.md) user guides.

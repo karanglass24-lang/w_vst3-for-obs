@@ -1,0 +1,2 @@
+#pragma once
+#define W_VST3_VERSION "@W_VST3_VERSION@"

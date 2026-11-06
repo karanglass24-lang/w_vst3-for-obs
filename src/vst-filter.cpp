@@ -16,6 +16,7 @@
 
 #include "juce-host.h"
 #include "scanner.h"
+#include "updater.h"
 
 namespace {
 
@@ -287,6 +288,45 @@ bool rescan_clicked(obs_properties_t *, obs_property_t *, void *)
 	return false;
 }
 
+bool update_clicked(obs_properties_t *, obs_property_t *, void *)
+{
+	wvst::updater::start_download();
+	return true; // refresh the properties view so the new status shows
+}
+
+// A disabled button is used as a read-only status line.
+void add_status_line(obs_properties_t *props, const std::string &text)
+{
+	obs_property_t *p = obs_properties_add_button(props, "update_status", text.c_str(), nullptr);
+	obs_property_set_enabled(p, false);
+}
+
+void add_update_ui(obs_properties_t *props)
+{
+	using State = wvst::updater::Status::State;
+	const auto st = wvst::updater::status();
+	const std::string cur = wvst::updater::current_version();
+	switch (st.state) {
+	case State::Available:
+		add_status_line(props, "Update available: v" + st.latest + " (current v" + cur + ")");
+		obs_properties_add_button(props, "update_download", "Download update (installs when OBS closes)",
+					  update_clicked);
+		break;
+	case State::Downloading:
+		add_status_line(props, "Downloading update v" + st.latest + "... reopen this window to check");
+		break;
+	case State::Ready:
+		add_status_line(props, "Update v" + st.latest + " is ready. It installs when OBS closes.");
+		break;
+	case State::Failed:
+		add_status_line(props, "Update failed: " + st.message);
+		obs_properties_add_button(props, "update_download", "Retry download", update_clicked);
+		break;
+	default:
+		break;
+	}
+}
+
 bool open_editor_clicked(obs_properties_t *, obs_property_t *, void *data)
 {
 	auto *d = static_cast<FilterData *>(data);
@@ -303,6 +343,8 @@ obs_properties_t *filter_properties(void *data)
 {
 	auto *d = static_cast<FilterData *>(data);
 	obs_properties_t *props = obs_properties_create();
+
+	add_update_ui(props);
 
 	obs_property_t *list = obs_properties_add_list(props, "plugin_path", "VST3 plugin", OBS_COMBO_TYPE_LIST,
 						       OBS_COMBO_FORMAT_STRING);

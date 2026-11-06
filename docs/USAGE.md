@@ -67,6 +67,18 @@ Quit OBS and delete `C:\ProgramData\obs-studio\plugins\w_vst3`. To also remove t
 | Open plugin editor | Opens the plugin GUI. |
 | Bypass | Sends the original sound through without the plugin. |
 
+## Updates
+
+When OBS starts, w_vst3 checks the latest GitHub release once. If a newer version exists, the filter properties show **Update available** and a **Download update** button.
+
+1. Click **Download update**. The installer and its `.sha256` file are downloaded and the SHA-256 is verified. A mismatch discards the download.
+2. When you quit OBS, the installer starts and Windows asks for administrator approval.
+
+Nothing is installed unless you click the button.
+
+- The check sends one HTTPS request to `api.github.com`. To turn it off, create `%APPDATA%\obs-studio\plugin_config\w_vst3\settings.json` containing `{ "check_updates": false }`.
+- The installer is not code-signed, so Windows SmartScreen may warn.
+
 ## Known limitations
 
 - **Latency.** If a plugin has its own latency, the sound is delayed by that amount. For example, RX 11 De-click is about 0.7 seconds. An OBS filter cannot compensate for it. If audio and video drift apart, adjust the sync offset in the source's Advanced Audio Properties.

@@ -2,6 +2,7 @@
 
 #include "juce-host.h"
 #include "scanner.h"
+#include "updater.h"
 
 OBS_DECLARE_MODULE()
 
@@ -16,6 +17,7 @@ bool obs_module_load(void)
 {
 	wvst::juce_host::start();
 	wvst::scanner::init();
+	wvst::updater::init();
 	obs_register_source(&w_vst3_filter_info);
 	blog(LOG_INFO, "[w_vst3] loaded");
 	return true;
@@ -23,6 +25,7 @@ bool obs_module_load(void)
 
 void obs_module_unload(void)
 {
+	wvst::updater::shutdown();
 	wvst::scanner::shutdown();
 	wvst::juce_host::stop();
 	blog(LOG_INFO, "[w_vst3] unloaded");

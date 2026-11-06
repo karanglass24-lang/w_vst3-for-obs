@@ -16,17 +16,24 @@ FetchContent_Declare(
   GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(JUCE)
 
+# Shown in the update check. CI passes the release tag; local builds use the project version.
+set(W_VST3_VERSION "${PROJECT_VERSION}" CACHE STRING "Plugin version string")
+configure_file(src/version.h.in "${CMAKE_BINARY_DIR}/generated/version.h" @ONLY)
+
 add_library(w_vst3 MODULE
   src/plugin-main.cpp
   src/juce-host.cpp
   src/scanner.cpp
+  src/updater.cpp
+  src/updater-win.cpp
   src/vst-filter.cpp)
 
-target_include_directories(w_vst3 PRIVATE "${LIBOBS_INCLUDE_DIR}")
+target_include_directories(w_vst3 PRIVATE "${LIBOBS_INCLUDE_DIR}" "${CMAKE_BINARY_DIR}/generated")
 target_link_libraries(w_vst3 PRIVATE
   "${LIBOBS_LIB}"
   juce::juce_audio_processors
   juce::juce_gui_basics
+  juce::juce_cryptography
   juce::juce_recommended_config_flags)
 
 target_compile_definitions(w_vst3 PRIVATE

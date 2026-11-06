@@ -67,6 +67,18 @@ OBS를 종료하고 `C:\ProgramData\obs-studio\plugins\w_vst3` 폴더를 삭제�
 | Open plugin editor | 플러그인 GUI를 연다. |
 | Bypass | 플러그인을 거치지 않고 원본 소리를 그대로 내보낸다. |
 
+## 업데이트
+
+OBS를 시작할 때 w_vst3가 GitHub 최신 릴리스를 한 번 확인한다. 새 버전이 있으면 필터 속성에 **Update available** 표시와 **Download update** 버튼이 나타난다.
+
+1. **Download update**를 누르면 설치 파일과 `.sha256` 파일을 받고 SHA-256을 검증한다. 일치하지 않으면 받은 파일을 버린다.
+2. OBS를 종료하면 설치 프로그램이 실행되고, Windows가 관리자 권한 승인을 묻는다.
+
+버튼을 누르지 않으면 아무것도 설치되지 않는다.
+
+- 확인할 때 `api.github.com`으로 HTTPS 요청을 한 번 보낸다. 끄려면 `%APPDATA%\obs-studio\plugin_config\w_vst3\settings.json` 파일을 만들고 `{ "check_updates": false }`를 넣는다.
+- 설치 프로그램은 코드 서명이 없어서 Windows SmartScreen 경고가 뜰 수 있다.
+
 ## 알려진 한계
 
 - **지연**: 플러그인이 자체 지연(latency)을 가지면 그만큼 소리가 늦어진다. 예를 들어 RX 11 De-click은 약 0.7초다. OBS 필터는 지연을 보상할 수 없다. 영상과 어긋나면 소스의 **고급 오디오 속성**에서 동기화 오프셋을 조정한다.
