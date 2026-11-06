@@ -6,6 +6,9 @@ on:
     tags: ["v*"]
   pull_request:
 
+permissions:
+  contents: write # needed to create GitHub releases
+
 jobs:
   windows:
     runs-on: windows-latest
@@ -51,4 +54,18 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          name: w_vst3 ${{ steps.ver.outputs.version }}
           files: dist/*.exe
+          body: |
+            OBS Studio plugin that hosts one VST3 effect as an audio filter.
+
+            **Install:** quit OBS, run the setup exe. (Korean and English installer.)
+            Tested with OBS Studio 33.0.1 on Windows 64-bit.
+
+            **Known limitations**
+            - Plugin latency is not compensated (for example RX De-click is about 0.7 s).
+            - Only the first two channels (mono/stereo) are processed.
+            - Plugins run inside the OBS process; a plugin crash can crash OBS.
+            - The installer is unsigned, so Windows SmartScreen may warn.
+
+            See the [English](docs/USAGE.md) and [한국어](docs/USAGE.ko.md) user guides.
