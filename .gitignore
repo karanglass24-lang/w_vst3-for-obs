@@ -3,3 +3,4 @@ deps/
 .vs/
 *.user
 dist/
+dist-ci/
