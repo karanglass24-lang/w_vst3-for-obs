@@ -2,6 +2,8 @@
 
 Minimal OBS Studio plugin that hosts a single VST3 effect as an audio filter.
 
+만든 곳: [두목넷](https://dumok.net)
+
 Status: M3. The filter scans installed VST3 plugins (out-of-process), lets you pick one from a list, opens its editor window, and saves/restores plugin state in the OBS profile.
 
 Install: copy `w_vst3.dll` and `w_vst3_scanner.exe` to `C:\ProgramData\obs-studio\plugins\w_vst3\`.
@@ -55,3 +57,10 @@ CI builds `w_vst3-<version>-windows-x64-setup.exe` with Inno Setup (`installer/w
 ## License
 
 AGPL-3.0 (see LICENSE). Built with JUCE (AGPL-3.0 option).
+
+## 만든 사람
+
+왕두목 · [두목넷 dumok.net](https://dumok.net) — 정보처리·사무자동화·컴활 자격증 온라인 강의
+
+- 학습 블로그: https://dumok.net/blog
+- 유튜브: https://www.youtube.com/@extudy
